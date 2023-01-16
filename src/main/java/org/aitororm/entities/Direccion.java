@@ -2,9 +2,12 @@ package org.aitororm.entities;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 @Entity
 @Table(name = "direcciones")
-public class Direccion {
+public class Direccion implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -72,5 +75,18 @@ public class Direccion {
                 ", poblacion='" + poblacion + '\'' +
                 ", provincia='" + provincia + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Direccion direccion = (Direccion) o;
+        return id == direccion.id && numero == direccion.numero && Objects.equals(calle, direccion.calle) && Objects.equals(poblacion, direccion.poblacion) && Objects.equals(provincia, direccion.provincia);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, calle, numero, poblacion, provincia);
     }
 }

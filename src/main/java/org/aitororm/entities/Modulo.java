@@ -2,19 +2,27 @@ package org.aitororm.entities;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 @Entity
 @Table(name = "modulos")
-public class Modulo {
+public class Modulo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(unique = true)
     private String nombre;
     private String curso;
     private int numHorasSemanales;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Profesor profesor;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "modulos")
+    private Set<Alumno> alumnos;
 
     public Modulo() {
     }
@@ -24,6 +32,7 @@ public class Modulo {
         this.curso = curso;
         this.numHorasSemanales = numHorasSemanales;
         this.profesor = profesor;
+        alumnos = new HashSet<>();
     }
 
     public long getId() {
@@ -66,6 +75,14 @@ public class Modulo {
         this.profesor = profesor;
     }
 
+    public Set<Alumno> getAlumnos() {
+        return alumnos;
+    }
+
+    public void setAlumnos(Set<Alumno> alumnos) {
+        this.alumnos = alumnos;
+    }
+
     @Override
     public String toString() {
         return "Modulo{" +
@@ -75,5 +92,18 @@ public class Modulo {
                 ", numHorasSemanales=" + numHorasSemanales +
                 ", profesor=" + profesor +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Modulo modulo = (Modulo) o;
+        return id == modulo.id && numHorasSemanales == modulo.numHorasSemanales && Objects.equals(nombre, modulo.nombre) && Objects.equals(curso, modulo.curso) && Objects.equals(profesor, modulo.profesor) && Objects.equals(alumnos, modulo.alumnos);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nombre, curso, numHorasSemanales, profesor);
     }
 }

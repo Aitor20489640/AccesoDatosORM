@@ -2,11 +2,13 @@ package org.aitororm.entities;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "profesores")
-public class Profesor {
+public class Profesor implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -14,26 +16,31 @@ public class Profesor {
     private String primerApellido;
     private String segundoApellido;
     private String telefono;
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private Direccion direccion;
 
-    @OneToMany(mappedBy = "profesor", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "profesor", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Modulo> modulos;
 
     public Profesor() {
     }
 
-    public Profesor(String nombre, String primerApellido, String segundoApellido, String telefono, Set<Modulo> modulos) {
+    public Profesor(String nombre, String primerApellido, String segundoApellido, String telefono, Direccion direccion, Set<Modulo> modulos) {
         this.nombre = nombre;
         this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
         this.telefono = telefono;
+        this.direccion = direccion;
         this.modulos = modulos;
     }
 
-    public Profesor(String nombre, String primerApellido, String segundoApellido, String telefono) {
+    public Profesor(String nombre, String primerApellido, String segundoApellido, String telefono, Direccion direccion) {
         this.nombre = nombre;
         this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
         this.telefono = telefono;
+        this.direccion = direccion;
     }
 
     public long getId() {
@@ -84,6 +91,14 @@ public class Profesor {
         this.modulos = modulos;
     }
 
+    public Direccion getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(Direccion direccion) {
+        this.direccion = direccion;
+    }
+
     @Override
     public String toString() {
         return "Profesor{" +
@@ -91,7 +106,21 @@ public class Profesor {
                 ", nombre='" + nombre + '\'' +
                 ", primerApellido='" + primerApellido + '\'' +
                 ", segundoApellido='" + segundoApellido + '\'' +
-                ", telefono='" + telefono +
+                ", telefono='" + telefono + '\'' +
+                ", direccion=" + direccion +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Profesor profesor = (Profesor) o;
+        return id == profesor.id && Objects.equals(nombre, profesor.nombre) && Objects.equals(primerApellido, profesor.primerApellido) && Objects.equals(segundoApellido, profesor.segundoApellido) && Objects.equals(telefono, profesor.telefono) && Objects.equals(direccion, profesor.direccion) && Objects.equals(modulos, profesor.modulos);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nombre, primerApellido, segundoApellido, telefono, direccion);
     }
 }
