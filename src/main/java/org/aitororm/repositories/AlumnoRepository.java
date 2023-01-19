@@ -1,5 +1,7 @@
 package org.aitororm.repositories;
 
+import jakarta.persistence.PersistenceException;
+import jakarta.transaction.Transactional;
 import org.aitororm.entities.Alumno;
 import org.aitororm.utils.HibernateUtil;
 import org.hibernate.Session;
@@ -14,9 +16,14 @@ public class AlumnoRepository implements Repository<Alumno> {
     Session s = sf.openSession();
     @Override
     public Alumno create(Alumno alumno) {
-        s.getTransaction().begin();
-        s.persist(alumno);
-        s.getTransaction().commit();
+        try {
+            s.getTransaction().begin();
+            s.persist(alumno);
+            s.getTransaction().commit();
+        } catch (PersistenceException e) {
+            System.out.println("Ya existe el alumno o alguno de sus asociados");
+            s.getTransaction().rollback();
+        }
         return alumno;
     }
 
@@ -29,6 +36,7 @@ public class AlumnoRepository implements Repository<Alumno> {
     }
 
     @Override
+    @Transactional
     public List<Alumno> readAll() {
         s.getTransaction().begin();
         List<Alumno> alumno = s.createSelectionQuery("from Alumno ", Alumno.class).list();

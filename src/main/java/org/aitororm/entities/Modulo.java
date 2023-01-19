@@ -8,13 +8,12 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "modulos")
+@Table(name = "modulos", uniqueConstraints = @UniqueConstraint(columnNames = {"nombre", "curso"}))
 public class Modulo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(unique = true)
     private String nombre;
     private String curso;
     private int numHorasSemanales;
